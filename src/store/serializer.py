@@ -29,7 +29,7 @@ class CompanyBankSerializer(serializers.ModelSerializer):
 
     def to_representation(self,instance):
         response= super().to_representation(instance)
-        response['company']= CompanySerializer(instance.company).data
+        response['company_id']= CompanySerializer(instance.company).data
         return response
 
 

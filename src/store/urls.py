@@ -9,6 +9,8 @@ from .views import CustomerViewSet, CustomerRequestViewSet
 from .views import BillDetailViewSet, BillViewSet
 
 
+from .views import CompanyNameViewSet
+
 route= routers.DefaultRouter()
 route.register("company",CompanyViewSet, basename="company")
 route.register("company-bank",CompanyBankViewSet, basename="company-bank")
@@ -20,5 +22,6 @@ route.register("bill",BillViewSet, basename="bill")
 
 
 urlpatterns = [
+    path('api/companybyname/<str:name>',CompanyNameViewSet.as_view(),name="companybyname"),
 
 ]+ route.urls

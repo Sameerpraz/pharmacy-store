@@ -17,6 +17,8 @@ from .models import Bill, BillDetail
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated 
 
+from rest_framework import generics
+
 # Create your views here.
 class CompanyViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
@@ -48,7 +50,14 @@ class CompanyViewSet(viewsets.ViewSet):
         except:
             dict_response = {"error": True, "message": "error occurs"}
         return Response(dict_response)
-    
+
+
+class CompanyNameViewSet(generics.ListAPIView):
+    serializer_class=CompanySerializer
+    def get_queryset(self):
+        name=self.kwargs["name"]
+        return Company.objects.filter(name=name)
+
 
 class CompanyBankViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
@@ -62,8 +71,8 @@ class CompanyBankViewSet(viewsets.ViewSet):
     
     def create(self,request):
         try:
-            serializer = CompanyBank(data=request.data,context={"request":request})
-            serializer.is_valid(rais_exception=True)
+            serializer = CompanyBankSerializer(data=request.data,context={"request":request})
+            serializer.is_valid(raise_exception=True)
             serializer.save()
             dict_response = {"error": False, "message": "success", "data": serializer.data}
         except:
