@@ -40,26 +40,26 @@ class MedicineSerializer(serializers.ModelSerializer):
     
     def to_representation(self,instance):
         response= super().to_representation(instance)
-        response['company']= CompanySerializer(instance.company).data
+        response['company_id']= CompanySerializer(instance.company).data
         return response
 
-
-class MedicalMasterDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MedicalDetail
-        fields = '__all__'
-    
-    def to_representation(self,instance):
-        response= super().to_representation(instance)
-        response['medicine']= MedicineSerializer(instance.medicine).data
-        return response
 
 class MedicalDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = MedicalDetail
         fields = '__all__'
+        
+    def to_representation(self,instance):
+        response= super().to_representation(instance)
+        response['medicine']= MedicineSerializer(instance.medicine).data
+        return response
     
-
+class MedicalDetailSerializerSimple(serializers.ModelSerializer):
+    class Meta:
+        model = MedicalDetail
+        fields = '__all__'
+    
+    
 
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:

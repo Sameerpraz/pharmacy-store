@@ -24,10 +24,10 @@ class CompanyAccountAdmin(admin.ModelAdmin):
     list_display = ['id','company','transaction_type','transaction_amount','payment_mode']
 
 class MedicineAdmin(admin.ModelAdmin):
-    list_display = ['name', 'medical_type']
+    list_display = ['id','name', 'medical_type']
 
 class MedicineDetailAdmin(admin.ModelAdmin):
-    list_display = ['medicine', 'salt_name','salt_qty', 'salt_qty_type']
+    list_display = ['id','medicine', 'salt_name','salt_qty', 'salt_qty_type']
 
 admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(EmployeeBank,EmployeeBankAdmin)

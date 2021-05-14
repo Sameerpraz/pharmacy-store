@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from .serializer import CompanySerializer, CompanyBankSerializer, CompanyAccountSerializer
 from .serializer import EmployeeSerializer,EmployeeBankSerializer, EmployeeSalarySerializer
-from .serializer import MedicineSerializer, MedicalDetailSerializer
+from .serializer import MedicineSerializer, MedicalDetailSerializer, MedicalDetailSerializerSimple
 from .serializer import CustomerSerializer, CustomerRequestSerializer
 from .serializer import BillSerializer, BillDetailSerializer
 from .models import Company, CompanyBank, CompanyAccount
@@ -12,7 +12,7 @@ from .models import Employee, EmployeeBank, EmployeeSalary
 from .models import Medicine, MedicalDetail
 from .models import Customer, CustomerRequest
 from .models import Bill, BillDetail
-
+# from rest_framework import status
 
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated 
@@ -109,7 +109,7 @@ class CompanyAccountViewSet(viewsets.ViewSet):
     def create(self,request):
         try:
             serializer = CompanyAccount(data=request.data,context={"request":request})
-            serializer.is_valid(rais_exception=True)
+            serializer.is_valid(raise_exception=True)
             serializer.save()
             dict_response = {"error": False, "message": "success", "data": serializer.data}
         except:
@@ -136,8 +136,38 @@ class CompanyAccountViewSet(viewsets.ViewSet):
 
 
 class MedicineViewSet(viewsets.ViewSet):
-    # authentication_classes = [JWTAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def create(self,request):
+        try:
+            serializer = MedicineSerializer(data=request.data,context={"request":request})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            print(serializer)
+            medicine =serializer.data['id']
+            
+            print(medicine)
+
+            # adding and saving id into medicine details Table
+            medicine_details_list=[]
+            for medicine_detail in request.data['medicine_details']:
+                print(medicine_detail)
+                # adding the medicine id to medicine details
+                medicine_detail["medicine"]=medicine
+                medicine_details_list.append(medicine_detail)
+                print(medicine_detail)
+            print(medicine_details_list)   
+            serializer_medicine_detail=MedicalDetailSerializer(data=medicine_details_list,many=True,context={"request":request})
+            
+            serializer_medicine_detail.is_valid(raise_exception=True)
+            
+            serializer_medicine_detail.save()
+            dict_response = {"error": False, "message": "success"}
+        except:
+            dict_response = {"error": True, "message": "success"}
+        return Response(dict_response)
+ 
     def list(self, request):
         queryset = Medicine.objects.all()
         serializer = MedicineSerializer(queryset, many=True, context={"request": request})
@@ -147,34 +177,26 @@ class MedicineViewSet(viewsets.ViewSet):
 # adding extra key for medicine details in medicine
         for medicine in medicine_data:
             medicine_details= MedicalDetail.objects.filter(medicine=medicine['id'])
-            medicine_datails_serializers=MedicalDetailSerializer(medicine_details,many=True)
+            medicine_datails_serializers=MedicalDetailSerializerSimple(medicine_details,many=True)
             medicine['medicine_details']=medicine_datails_serializers.data
             newmedicinelist.append(medicine)
-
-
-
 
         response_dict = {"error": False, "message": "success", "data": serializer.data}
         return Response(response_dict)
 
-    def create(self,request):
-        try:
-            serializer = MedicineSerializer(data=request.data,context={"request":request})
-            serializer.is_valid()
-            serializer.save()
-            dict_response = {"error": False, "message": "success", "data": serializer.data}
-        except:
-            dict_response = {"error": True, "message": "error occurs"}
-        return Response(dict_response)
+    
     
     def retrieve(self,request, pk=None):
         queryset= Medicine.objects.all()
-        medicine= get_object_or_404(queryset,pk=pk)
-        serializer = MedicineSerializer(medicine)
-        serializer_data =serializer.data
-        medicine_details= MedicalDetail.objects.filter(medicine=serializer_data["id"])
-        medicine_details_serializers=MedicalDetailSerializer(medicine_details,many=True)
-        serializer_data["medicine_details"]=medicine_details_serializers.data
+        medicine_q= get_object_or_404(queryset,pk=pk)
+        serializer = MedicineSerializer(medicine_q,context={"request":request})
+
+        serializer_data = serializer.data
+
+        medicine_details= MedicalDetail.objects.filter(medicine=serializer_data['id'])
+        medicine_datails_serializers=MedicalDetailSerializerSimple(medicine_details,many=True)
+        serializer_data['medicine_details']=medicine_datails_serializers.data
+         
         dict_response = {"error": False, "message": "success", "data": serializer_data}
         return Response(dict_response)
 
@@ -444,6 +466,7 @@ class BillDetailViewSet(viewsets.ViewSet):
 
 
 company_list = CompanyViewSet.as_view({"get": "list"})
+company_create=CompanyViewSet.as_view({"post":"create"})
 company_update = CompanyViewSet.as_view({"put": "update"})
 
 
