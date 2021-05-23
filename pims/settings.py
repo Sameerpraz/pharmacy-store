@@ -26,7 +26,7 @@ SECRET_KEY = 'hamde&*!2j4(2jv&hy)@%5&^f$*k)yi#%1-o&9as49ni=g7z#i'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -68,10 +68,10 @@ REST_FRAMEWORK={
 }
 
 
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=160),
-    "REFRESH_TOKEN_LIFETIME": timedelta(minutes=160),
-}
+# SIMPLE_JWT = {
+#     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=160),
+#     "REFRESH_TOKEN_LIFETIME": timedelta(minutes=160),
+# }
 
 ROOT_URLCONF = 'pims.urls'
 

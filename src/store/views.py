@@ -216,14 +216,14 @@ class MedicineDetailViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     def list(self, request):
-        queryset = MedicineDetail.objects.all()
-        serializer = MedicineDetailSerializer(queryset, many=True, context={"request": request})
+        queryset = MedicalDetail.objects.all()
+        serializer = MedicalDetailSerializer(queryset, many=True, context={"request": request})
         response_dict = {"error": False, "message": "success", "data": serializer.data}
         return Response(response_dict)
 
     def create(self,request):
         try:
-            serializer = MedicineDetailSerializer(data=request.data,context={"request":request})
+            serializer = MedicalDetailSerializer(data=request.data,context={"request":request})
             serializer.is_valid()
             serializer.save()
             dict_response = {"error": False, "message": "success", "data": serializer.data}
@@ -234,9 +234,9 @@ class MedicineDetailViewSet(viewsets.ViewSet):
     
     def update(self,request,pk=None):
         try:
-            queryset=MedicineDetail.objects.all()
+            queryset=MedicalDetail.objects.all()
             medicine_detail=get_object_or_404(queryset, pk=pk)
-            serializer = MedicineDetailSerializer(medicine_detail, data=request.data, context={"request":request})
+            serializer = MedicalDetailSerializer(medicine_detail, data=request.data, context={"request":request})
             serializer.is_valid()
             serializer.save()
             dict_response = {"error": False, "message": "success", "data": serializer.data}
